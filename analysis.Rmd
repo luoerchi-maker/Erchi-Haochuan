@@ -1,0 +1,48 @@
+---
+title: "Spatiotemporal Analysis of Reported Direct GHG Emissions from Large Direct-Emitting Facilities in North Carolina, 2019–2023"
+author: "Erchi Luo and Haochuan Zhan"
+date: "`r Sys.Date()`"
+output:
+  html_document:
+    toc: true
+    toc_depth: 2
+    number_sections: true
+---
+# Introduction
+
+The EPA Greenhouse Gas Reporting Program requires large facilities above the reporting threshold to submit annual emissions data. This project focuses on reported direct greenhouse gas emissions from large direct-emitting facilities in North Carolina from 2019 to 2023. North Carolina provides a useful case because it contains multiple large facilities distributed across different counties, which makes it possible to examine both spatial concentration and short-term temporal change in reported emissions.
+
+This project is designed as a reproducible R-based workflow that combines data cleaning, exploratory analysis, and introductory analytical methods. The goal is to determine whether reported emissions were concentrated in a small number of counties and whether statewide reported emissions declined over the study period.
+
+# Research Questions
+
+1. Are facility emissions concentrated in a small number of North Carolina counties?
+2. Did statewide reported direct GHG emissions decline from 2019 to 2023?
+
+# Hypotheses
+
+1. Reported direct GHG emissions are concentrated in a small number of North Carolina counties.
+2. Statewide reported direct GHG emissions from North Carolina large direct-emitting facilities declined from 2019 to 2023.
+
+# Data Description
+
+The project uses the EPA Greenhouse Gas Reporting Program downloadable workbook. The current analysis focuses on the Direct Point Emitters sheet and restricts the data to North Carolina facilities. The primary variable of interest is total reported direct emissions in metric tons CO2e.
+
+At this stage, the workflow has produced an initial North Carolina subset from the raw workbook. Additional cleaning and restructuring will be completed in the next steps of the project.
+
+# Next Steps
+
+The next stage of the analysis will:
+
+- clean and standardize facility fields
+- examine missing values
+- restructure emissions data for analysis
+- create exploratory visualizations
+- prepare county-level and statewide summaries
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(
+  echo = TRUE,
+  warning = FALSE,
+  message = FALSE
+)
