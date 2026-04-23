@@ -8,37 +8,6 @@ output:
     toc_depth: 2
     number_sections: true
 ---
-# Introduction
-
-The EPA Greenhouse Gas Reporting Program requires large facilities above the reporting threshold to submit annual emissions data. This project focuses on reported direct greenhouse gas emissions from large direct-emitting facilities in North Carolina from 2019 to 2023. North Carolina provides a useful case because it contains multiple large facilities distributed across different counties, which makes it possible to examine both spatial concentration and short-term temporal change in reported emissions.
-
-This project is designed as a reproducible R-based workflow that combines data cleaning, exploratory analysis, and introductory analytical methods. The goal is to determine whether reported emissions were concentrated in a small number of counties and whether statewide reported emissions declined over the study period.
-
-# Research Questions
-
-1. Are facility emissions concentrated in a small number of North Carolina counties?
-2. Did statewide reported direct GHG emissions decline from 2019 to 2023?
-
-# Hypotheses
-
-1. Reported direct GHG emissions are concentrated in a small number of North Carolina counties.
-2. Statewide reported direct GHG emissions from North Carolina large direct-emitting facilities declined from 2019 to 2023.
-
-# Data Description
-
-The project uses the EPA Greenhouse Gas Reporting Program downloadable workbook. The current analysis focuses on the Direct Point Emitters sheet and restricts the data to North Carolina facilities. The primary variable of interest is total reported direct emissions in metric tons CO2e.
-
-At this stage, the workflow has produced an initial North Carolina subset from the raw workbook. Additional cleaning and restructuring will be completed in the next steps of the project.
-
-# Next Steps
-
-The next stage of the analysis will:
-
-- clean and standardize facility fields
-- examine missing values
-- restructure emissions data for analysis
-- create exploratory visualizations
-- prepare county-level and statewide summaries
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(
@@ -46,3 +15,76 @@ knitr::opts_chunk$set(
   warning = FALSE,
   message = FALSE
 )
+```
+
+```{r packages}
+library(readr)
+library(dplyr)
+library(knitr)
+library(here)
+```
+
+```{r load-data}
+raw_summary <- read_csv(here("data", "processed", "raw_summary.csv"), show_col_types = FALSE)
+nc_wide <- read_csv(here("data", "processed", "nc_direct_emitters_wide.csv"), show_col_types = FALSE)
+nc_long <- read_csv(here("data", "processed", "nc_direct_emitters_long.csv"), show_col_types = FALSE)
+nc_long_complete <- read_csv(here("data", "processed", "nc_direct_emitters_long_complete.csv"), show_col_types = FALSE)
+state_totals_complete <- read_csv(here("data", "processed", "state_totals_complete_facilities.csv"), show_col_types = FALSE)
+```
+
+# Introduction
+
+The EPA Greenhouse Gas Reporting Program requires large facilities above the reporting threshold to submit annual emissions data. This project examines reported direct greenhouse gas emissions from large direct-emitting facilities in North Carolina from 2019 to 2023. North Carolina provides a useful case because it contains multiple large facilities across different counties, which makes it possible to study both spatial concentration and short-term temporal change in reported emissions.
+
+This project follows a reproducible R-based workflow that combines data cleaning, exploratory analysis, and introductory analytical methods. The central goal is to determine whether reported emissions were concentrated in a small number of counties and whether statewide reported emissions declined over the study period.
+
+# Research Questions
+1.Are facility emissions concentrated in a small number of North Carolina counties?
+2.Did statewide reported direct GHG emissions decline from 2019 to 2023?
+
+# Hypotheses
+1.Reported direct GHG emissions are concentrated in a small number of North Carolina counties.
+2.Statewide reported direct GHG emissions from North Carolina large direct-emitting facilities declined from 2019 to 2023.
+
+# Data Description
+
+The project uses the EPA Greenhouse Gas Reporting Program downloadable workbook. The analysis focuses on the Direct Point Emitters sheet and restricts the data to North Carolina facilities. The main variable of interest is total reported direct emissions in metric tons CO2e.
+
+At this stage, the processed data include a cleaned wide-format facility dataset, a long-format facility-year dataset, a complete-reporting facility subset, and statewide annual totals for complete-reporting facilities. These files were produced from the raw workbook through scripted processing in R.
+
+```{r raw-summary-table}
+kable(raw_summary, caption = "Initial summary of the North Carolina facility dataset.")
+```
+
+Table 1 summarizes the size of the North Carolina subset and the main missing-data issues identified during the cleaning process.
+
+# Cleaning and Processing
+
+The workflow begins with the GHGRP workbook stored in data/raw/. The Direct Point Emitters sheet is read into R, and the data are filtered to facilities located in North Carolina. Core facility fields and annual emissions columns for 2019 through 2023 are retained.
+
+County names are then standardized into a consistent format, and a cleaned wide-format dataset is created. After that, the annual emissions columns are reshaped from wide format to long format so that each facility-year observation occupies one row. A complete-reporting subset is also created by retaining only facilities with non-missing emissions records in all five years from 2019 to 2023. Finally, annual statewide totals are calculated from the complete-reporting subset.
+
+All cleaning and restructuring steps are completed in R, and no manual edits are made to the raw workbook outside the scripted workflow.
+
+# Preliminary Data Check
+
+The cleaned wide-format dataset contains the core facility identifiers, location fields, industry fields, and annual emissions variables. The long-format dataset reorganizes these annual emissions into a facility-year structure that is more suitable for trend analysis and later visualization.
+
+```{r preview-wide}
+kable(head(nc_wide), caption = "Preview of the cleaned wide-format North Carolina facility dataset.")
+```
+
+```{r preview-long}
+kable(head(nc_long), caption = "Preview of the long-format North Carolina facility-year dataset.")
+```
+
+
+# Next Steps
+
+The next stage of the analysis will:
+
+examine the distribution of facility emissions
+evaluate county-level concentration patterns
+identify top-emitting counties
+visualize county-level totals
+summarize statewide annual change among complete-reporting facilities
