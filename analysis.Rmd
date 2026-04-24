@@ -61,7 +61,8 @@ top10_share <- county_totals %>%
   pull(share)
 
 top5_counties <- county_totals %>%
-  slice_head(n = 5)
+  slice_head(n = 5) %>%
+  mutate(cumulative_emissions_mtco2e = comma(cumulative_emissions_mtco2e))
 
 em_2019 <- state_totals_complete %>%
   filter(year == 2019) %>%
@@ -72,15 +73,23 @@ em_2023 <- state_totals_complete %>%
   pull(total_emissions_mtco2e)
 
 state_pct_change <- (em_2023 - em_2019) / em_2019
+state_decline_pct <- abs(state_pct_change)
 
 concentration_table <- tibble(
   metric = c("Top 5 counties share", "Top 10 counties share"),
-  value = c(top5_share, top10_share)
+  value = c(
+    percent(top5_share, accuracy = 0.1),
+    percent(top10_share, accuracy = 0.1)
+  )
 )
 
 state_change_table <- tibble(
-  metric = c("2019 total emissions", "2023 total emissions", "Percent change 2019 to 2023"),
-  value = c(em_2019, em_2023, state_pct_change)
+  metric = c("2019 total emissions", "2023 total emissions", "Percent decline from 2019 to 2023"),
+  value = c(
+    comma(em_2019),
+    comma(em_2023),
+    percent(state_decline_pct, accuracy = 0.1)
+  )
 )
 ```
 # Introduction
@@ -99,7 +108,9 @@ This project follows a reproducible R-based workflow that combines data cleaning
 
 # Data Description
 
-The project uses the EPA Greenhouse Gas Reporting Program downloadable workbook. The analysis focuses on the Direct Point Emitters sheet and restricts the data to North Carolina facilities. The main variable of interest is total reported direct emissions in metric tons CO2e.
+The project uses the EPA Greenhouse Gas Reporting Program downloadable workbook. For this analysis, the workbook was accessed as a manually downloaded Excel file and stored in the `data/raw/` folder of the project. Because the dataset is published by a United States federal agency, it is treated here as public-domain data for course-based analysis.
+
+The report focuses on the `Direct Point Emitters` sheet and restricts the dataset to North Carolina facilities. This sheet was selected because it provides facility-level direct emissions records, which are appropriate for county-level aggregation and statewide trend summaries. The main variable of interest is total reported direct emissions in metric tons CO2e.
 
 At this stage, the processed data include a cleaned wide-format facility dataset, a long-format facility-year dataset, a complete-reporting facility subset, and statewide annual totals for complete-reporting facilities. These files were produced from the raw workbook through scripted processing in R.
 
@@ -152,10 +163,11 @@ ggplot(state_totals_complete, aes(x = year, y = total_emissions_mtco2e)) +
   geom_line() +
   geom_point() +
   labs(
-    title = "Statewide Reported Direct Emissions from Complete-Reporting Facilities",
+    title = "Statewide Reported Direct Emissions in NC, 2019–2023",
     x = "Year",
     y = "Total reported direct emissions"
-  )
+  ) +
+  scale_y_continuous(labels = scales::comma)
 ```
 
 Figure 3 provides a first look at statewide change across the five-year period. The complete-reporting subset makes it possible to describe annual change while reducing distortions caused only by changes in reporting coverage.
@@ -197,7 +209,7 @@ knitr::kable(
 )
 ```
 
-The statewide trend results support the second hypothesis. Reported direct emissions from complete-reporting facilities changed from `r comma(em_2019)` metric tons CO2e in 2019 to `r comma(em_2023)` metric tons CO2e in 2023. This represents a decline of `r percent(state_pct_change, accuracy = 0.1)`. Because the complete-reporting subset is used here, this result reflects the direction of change among consistently reporting facilities rather than changes caused only by entries appearing or disappearing across years.
+The statewide trend results support the second hypothesis. Reported direct emissions from complete-reporting facilities changed from `r comma(em_2019)` metric tons CO2e in 2019 to `r comma(em_2023)` metric tons CO2e in 2023. This represents a decline of `r percent(abs(state_pct_change), accuracy = 0.1)`.. Because the complete-reporting subset is used here, this result reflects the direction of change among consistently reporting facilities rather than changes caused only by entries appearing or disappearing across years.
 
 # Discussion
 
