@@ -11,7 +11,7 @@ output:
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(
-  echo = TRUE,
+  echo = FALSE,
   warning = FALSE,
   message = FALSE
 )
@@ -22,6 +22,7 @@ library(readr)
 library(dplyr)
 library(knitr)
 library(here)
+library(ggplot2)
 ```
 
 ```{r load-data}
@@ -32,6 +33,20 @@ nc_long_complete <- read_csv(here("data", "processed", "nc_direct_emitters_long_
 state_totals_complete <- read_csv(here("data", "processed", "state_totals_complete_facilities.csv"), show_col_types = FALSE)
 ```
 
+```{r derive-summaries}
+county_totals <- nc_long %>%
+  filter(!is.na(county_clean)) %>%
+  group_by(county_clean) %>%
+  summarise(
+    cumulative_emissions_mtco2e = sum(emissions_mtco2e, na.rm = TRUE),
+    .groups = "drop"
+  ) %>%
+  arrange(desc(cumulative_emissions_mtco2e))
+
+top10_counties <- county_totals %>%
+  slice_head(n = 10) %>%
+  mutate(county_clean = factor(county_clean, levels = rev(county_clean)))
+```
 # Introduction
 
 The EPA Greenhouse Gas Reporting Program requires large facilities above the reporting threshold to submit annual emissions data. This project examines reported direct greenhouse gas emissions from large direct-emitting facilities in North Carolina from 2019 to 2023. North Carolina provides a useful case because it contains multiple large facilities across different counties, which makes it possible to study both spatial concentration and short-term temporal change in reported emissions.
@@ -68,23 +83,52 @@ All cleaning and restructuring steps are completed in R, and no manual edits are
 
 # Preliminary Data Check
 
-The cleaned wide-format dataset contains the core facility identifiers, location fields, industry fields, and annual emissions variables. The long-format dataset reorganizes these annual emissions into a facility-year structure that is more suitable for trend analysis and later visualization.
 
-```{r preview-wide}
-kable(head(nc_wide), caption = "Preview of the cleaned wide-format North Carolina facility dataset.")
+The cleaned long-format dataset allows the project to examine both the distribution of facility-year emissions and the concentration of emissions across counties. The complete-reporting subset is used to summarize statewide annual change from 2019 to 2023.
+
+```{r emissions-histogram}
+ggplot(nc_long, aes(x = emissions_mtco2e)) +
+  geom_histogram(bins = 30) +
+  labs(
+    title = "Distribution of Facility-Year Reported Direct Emissions",
+    x = "Reported direct emissions in metric tons CO2e",
+    y = "Count"
+  )
 ```
 
-```{r preview-long}
-kable(head(nc_long), caption = "Preview of the long-format North Carolina facility-year dataset.")
+Figure 1 shows that the distribution of reported emissions is strongly right-skewed. Most facility-year observations are in the lower range, while a smaller number of facilities account for very large reported emissions.
+
+```{r top-counties-bar}
+ggplot(top10_counties, aes(x = county_clean, y = cumulative_emissions_mtco2e)) +
+  geom_col() +
+  labs(
+    title = "Top 10 North Carolina Counties by Cumulative Reported Direct Emissions",
+    x = "County",
+    y = "Cumulative reported direct emissions"
+  ) +
+  coord_flip()
 ```
 
+Figure 2 suggests that county-level reported emissions are highly uneven. A relatively small number of counties contribute a large share of cumulative emissions, which is consistent with the first research question.
+
+```{r statewide-line}
+ggplot(state_totals_complete, aes(x = year, y = total_emissions_mtco2e)) +
+  geom_line() +
+  geom_point() +
+  labs(
+    title = "Statewide Reported Direct Emissions from Complete-Reporting Facilities",
+    x = "Year",
+    y = "Total reported direct emissions"
+  )
+```
+
+Figure 3 provides a first look at statewide change across the five-year period. The complete-reporting subset makes it possible to describe annual change while reducing distortions caused only by changes in reporting coverage.
 
 # Next Steps
 
 The next stage of the analysis will:
 
-examine the distribution of facility emissions
-evaluate county-level concentration patterns
-identify top-emitting counties
-visualize county-level totals
-summarize statewide annual change among complete-reporting facilities
+- quantify county concentration more directly
+- identify the top-emitting counties in the state
+- summarize the magnitude of statewide decline from 2019 to 2023
+- refine methods, results, and interpretation sections
