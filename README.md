@@ -1,35 +1,38 @@
 # Erchi-Haochuan
-ENV 872 Course Project for Erchi Luo, and Haochuan Zhan
 
-# Spatiotemporal Analysis of Reported Direct GHG Emissions from Large Direct-Emitting Facilities in North Carolina, 2019–2023
-
-## Team Members
-- Erchi Luo
-- Haochuan Zhan
+ENV 872 course project by Erchi Luo and Haochuan Zhan.
 
 ## Project Question
-This project examines reported direct greenhouse gas emissions from large direct-emitting facilities in North Carolina from 2019 to 2023.
 
-The current research questions are:
-1. Are facility emissions concentrated in a small number of North Carolina counties?
-2. Did statewide reported direct GHG emissions decline from 2019 to 2023?
+This project asks two main questions:
+
+1. Are reported direct greenhouse gas emissions concentrated in a small number of North Carolina counties?
+2. Did statewide reported direct greenhouse gas emissions from large direct-emitting facilities decline from 2019 to 2023?
 
 ## Data Source
-The project uses publicly available data from the EPA Greenhouse Gas Reporting Program (GHGRP), with a focus on the Direct Point Emitters sheet of the downloadable workbook.
 
-## Planned Analytical Approach
-The analysis will use a reproducible R workflow including:
-- data cleaning and restructuring
-- county-level aggregation
-- exploratory visualization
-- mapping
-- simple trend analysis
+The project uses the EPA Greenhouse Gas Reporting Program downloadable workbook. The analysis focuses on the `Direct Point Emitters` sheet and restricts the data to North Carolina facilities. The raw Excel workbook is stored in `data/raw/ghgp_data_by_year_2023.xlsx`.
 
-## Reproducibility
-Project files will be organized using the course-required structure:
-- `data/raw/` for original files
-- `data/processed/` for cleaned outputs
-- `R/` for scripts
-- `figures/` and `output/` as needed
+County-level mapping and boundary data were accessed in R using the `tigris` package.
 
-Detailed reproduction steps will be added as the analysis progresses.
+## Analytical Approach
+
+The project follows a reproducible R workflow.
+
+- The raw workbook is imported and filtered to North Carolina facilities.
+- Core facility fields and annual emissions columns for 2019 through 2023 are retained.
+- County names are cleaned and standardized.
+- The cleaned wide-format dataset is reshaped into a long-format facility-year dataset.
+- A complete-reporting subset is created for facilities with non-missing emissions records in all five years.
+- County cumulative emissions totals and statewide annual totals are calculated.
+- The report uses descriptive tables, exploratory figures, and introductory analytical summaries to evaluate county concentration and statewide change.
+
+## Repository Structure
+
+```text
+data/
+  raw/
+  processed/
+R/
+analysis.Rmd
+README.md

@@ -209,7 +209,7 @@ knitr::kable(
 )
 ```
 
-The statewide trend results support the second hypothesis. Reported direct emissions from complete-reporting facilities changed from `r comma(em_2019)` metric tons CO2e in 2019 to `r comma(em_2023)` metric tons CO2e in 2023. This represents a decline of `r percent(abs(state_pct_change), accuracy = 0.1)`.. Because the complete-reporting subset is used here, this result reflects the direction of change among consistently reporting facilities rather than changes caused only by entries appearing or disappearing across years.
+The statewide trend results support the second hypothesis. Reported direct emissions from complete-reporting facilities changed from `r comma(em_2019)` metric tons CO2e in 2019 to `r comma(em_2023)` metric tons CO2e in 2023. This represents a decline of `r percent(abs(state_pct_change), accuracy = 0.1)`. Because the complete-reporting subset is used here, this result reflects the direction of change among consistently reporting facilities rather than changes caused only by entries appearing or disappearing across years.
 
 # Discussion
 
