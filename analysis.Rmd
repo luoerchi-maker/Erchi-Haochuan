@@ -23,6 +23,7 @@ library(dplyr)
 library(knitr)
 library(here)
 library(ggplot2)
+library(scales)
 ```
 
 ```{r load-data}
@@ -47,6 +48,41 @@ top10_counties <- county_totals %>%
   slice_head(n = 10) %>%
   mutate(county_clean = factor(county_clean, levels = rev(county_clean)))
 ```
+
+```{r result-summaries}
+top5_share <- county_totals %>%
+  slice_head(n = 5) %>%
+  summarise(share = sum(cumulative_emissions_mtco2e) / sum(county_totals$cumulative_emissions_mtco2e)) %>%
+  pull(share)
+
+top10_share <- county_totals %>%
+  slice_head(n = 10) %>%
+  summarise(share = sum(cumulative_emissions_mtco2e) / sum(county_totals$cumulative_emissions_mtco2e)) %>%
+  pull(share)
+
+top5_counties <- county_totals %>%
+  slice_head(n = 5)
+
+em_2019 <- state_totals_complete %>%
+  filter(year == 2019) %>%
+  pull(total_emissions_mtco2e)
+
+em_2023 <- state_totals_complete %>%
+  filter(year == 2023) %>%
+  pull(total_emissions_mtco2e)
+
+state_pct_change <- (em_2023 - em_2019) / em_2019
+
+concentration_table <- tibble(
+  metric = c("Top 5 counties share", "Top 10 counties share"),
+  value = c(top5_share, top10_share)
+)
+
+state_change_table <- tibble(
+  metric = c("2019 total emissions", "2023 total emissions", "Percent change 2019 to 2023"),
+  value = c(em_2019, em_2023, state_pct_change)
+)
+```
 # Introduction
 
 The EPA Greenhouse Gas Reporting Program requires large facilities above the reporting threshold to submit annual emissions data. This project examines reported direct greenhouse gas emissions from large direct-emitting facilities in North Carolina from 2019 to 2023. North Carolina provides a useful case because it contains multiple large facilities across different counties, which makes it possible to study both spatial concentration and short-term temporal change in reported emissions.
@@ -54,12 +90,12 @@ The EPA Greenhouse Gas Reporting Program requires large facilities above the rep
 This project follows a reproducible R-based workflow that combines data cleaning, exploratory analysis, and introductory analytical methods. The central goal is to determine whether reported emissions were concentrated in a small number of counties and whether statewide reported emissions declined over the study period.
 
 # Research Questions
-1.Are facility emissions concentrated in a small number of North Carolina counties?
-2.Did statewide reported direct GHG emissions decline from 2019 to 2023?
+1. Are facility emissions concentrated in a small number of North Carolina counties?
+2. Did statewide reported direct GHG emissions decline from 2019 to 2023?
 
 # Hypotheses
-1.Reported direct GHG emissions are concentrated in a small number of North Carolina counties.
-2.Statewide reported direct GHG emissions from North Carolina large direct-emitting facilities declined from 2019 to 2023.
+1. Reported direct GHG emissions are concentrated in a small number of North Carolina counties.
+2. Statewide reported direct GHG emissions from North Carolina large direct-emitting facilities declined from 2019 to 2023.
 
 # Data Description
 
@@ -123,6 +159,45 @@ ggplot(state_totals_complete, aes(x = year, y = total_emissions_mtco2e)) +
 ```
 
 Figure 3 provides a first look at statewide change across the five-year period. The complete-reporting subset makes it possible to describe annual change while reducing distortions caused only by changes in reporting coverage.
+
+# Methods
+
+To evaluate the first research question, cumulative reported direct emissions were summed across all available years for each county in the North Carolina facility dataset. County totals were then ranked from highest to lowest, and the shares represented by the top five and top ten counties were calculated. These measures provide a direct way to assess whether reported emissions were concentrated in a small number of counties.
+
+To evaluate the second research question, statewide annual totals were calculated using only the complete-reporting facility subset. This subset includes facilities with non-missing emissions data in every year from 2019 through 2023. Using this balanced subset reduces the risk that apparent change is driven only by changes in reporting coverage rather than emissions levels.
+
+# Results
+
+## Research Question 1: County Concentration
+
+```{r concentration-table}
+knitr::kable(
+  concentration_table,
+  caption = "Shares of cumulative statewide emissions represented by the top counties."
+)
+```
+
+The county concentration results support the first hypothesis. The top five counties accounted for `r percent(top5_share, accuracy = 0.1)` of cumulative reported direct emissions, while the top ten counties accounted for `r percent(top10_share, accuracy = 0.1)`. These values indicate that reported emissions were not evenly distributed across North Carolina counties. Instead, a relatively small number of counties contained a large share of cumulative reported emissions.
+
+```{r top-five-counties-table}
+knitr::kable(
+  top5_counties,
+  caption = "Top five North Carolina counties by cumulative reported direct emissions."
+)
+```
+
+The highest-emitting counties were identified directly from the cumulative county totals. These counties dominated the statewide ranking and are consistent with the strong concentration pattern suggested by the bar chart.
+
+## Research Question 2: Statewide Change from 2019 to 2023
+
+```{r state-change-table}
+knitr::kable(
+  state_change_table,
+  caption = "Statewide emissions change based on complete-reporting facilities."
+)
+```
+
+The statewide trend results support the second hypothesis. Reported direct emissions from complete-reporting facilities changed from `r comma(em_2019)` metric tons CO2e in 2019 to `r comma(em_2023)` metric tons CO2e in 2023. This represents a decline of `r percent(state_pct_change, accuracy = 0.1)`. Because the complete-reporting subset is used here, this result reflects the direction of change among consistently reporting facilities rather than changes caused only by entries appearing or disappearing across years.
 
 # Next Steps
 
