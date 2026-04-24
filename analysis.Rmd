@@ -199,11 +199,32 @@ knitr::kable(
 
 The statewide trend results support the second hypothesis. Reported direct emissions from complete-reporting facilities changed from `r comma(em_2019)` metric tons CO2e in 2019 to `r comma(em_2023)` metric tons CO2e in 2023. This represents a decline of `r percent(state_pct_change, accuracy = 0.1)`. Because the complete-reporting subset is used here, this result reflects the direction of change among consistently reporting facilities rather than changes caused only by entries appearing or disappearing across years.
 
-# Next Steps
+# Discussion
 
-The next stage of the analysis will:
+Two main findings emerge from this analysis. First, reported direct greenhouse gas emissions were strongly concentrated in a small number of North Carolina counties. The top five counties accounted for more than half of cumulative reported emissions, and the top ten counties accounted for more than four-fifths of the statewide total. This pattern is consistent with the idea that a relatively small number of counties contain the largest direct-emitting facilities rather than emissions being distributed evenly across the state.
 
-- quantify county concentration more directly
-- identify the top-emitting counties in the state
-- summarize the magnitude of statewide decline from 2019 to 2023
-- refine methods, results, and interpretation sections
+Second, statewide reported direct emissions from complete-reporting facilities declined between 2019 and 2023. This result suggests that, among facilities with consistent reporting across all five years, the overall direction of change was downward. At the same time, the annual series should be interpreted cautiously because the study period is short and the analysis is descriptive rather than causal.
+
+Taken together, these results show that the GHGRP facility dataset is sufficient to answer both research questions at an introductory analytical level. The county-level analysis identifies where reported emissions were concentrated, while the complete-reporting subset provides a clearer basis for describing recent statewide change.
+
+# Limitations
+
+This analysis has several limitations. First, the GHGRP includes only facilities above the federal reporting threshold, so it does not represent all greenhouse gas sources in North Carolina. Second, the study focuses on reported direct facility emissions and therefore does not describe the full statewide greenhouse gas profile. Third, the five-year time window is relatively short, which limits how strongly the statewide trend can be interpreted. Fourth, the statewide trend analysis relies on the complete-reporting subset rather than the full facility pool, because reporting coverage changes across facilities over time. Finally, the analysis is descriptive and does not identify the operational, economic, or policy mechanisms that produced the observed patterns.
+
+# Conclusion
+
+This project used EPA GHGRP facility data to examine reported direct greenhouse gas emissions from large direct-emitting facilities in North Carolina from 2019 to 2023. The results show that reported emissions were highly concentrated in a small number of counties, with the top five counties accounting for more than half of cumulative reported emissions and the top ten counties accounting for more than four-fifths of the statewide total. The results also show that statewide emissions from complete-reporting facilities declined from 2019 to 2023.
+
+Overall, the project supports the conclusion that reported direct emissions from large North Carolina facilities were geographically concentrated and that the balanced subset of complete-reporting facilities showed a net decline over the study period. These conclusions are based on a reproducible R workflow, transparent data cleaning, descriptive visualization, and introductory analytical methods that match the scope of the course.
+
+# References
+
+U.S. Environmental Protection Agency. Greenhouse Gas Reporting Program data. Accessed from the EPA GHGRP downloadable workbook used in this project.
+
+Walker, K. County boundary data retrieved in R using the `tigris` package.
+
+Wickham, H., François, R., Henry, L., Müller, K., and Vaughan, D. `dplyr`: A Grammar of Data Manipulation.
+
+Wickham, H., Vaughan, D., and Girlich, M. `tidyr`: Tidy Messy Data.
+
+Wickham, H. `ggplot2`: Create Elegant Data Visualisations Using the Grammar of Graphics.
